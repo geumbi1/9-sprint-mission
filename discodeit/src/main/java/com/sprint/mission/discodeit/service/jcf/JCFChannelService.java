@@ -1,17 +1,18 @@
 package main.java.com.sprint.mission.discodeit.service.jcf;
 
 import main.java.com.sprint.mission.discodeit.entity.Channel;
+import main.java.com.sprint.mission.discodeit.entity.ChannelType;
 import main.java.com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService { //implements 는 오버라이딩
+public class JCFChannelService implements ChannelService {
     public List<Channel> data = new ArrayList<>();
 
 
     @Override
-    public Channel create(String channelName, String description) {
+    public Channel create(ChannelType type, String channelName, String description) {
         Channel channel = new Channel(channelName, description);
         data.add(channel);
         return channel;

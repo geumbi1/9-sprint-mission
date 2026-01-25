@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    public List<User> data = new ArrayList<>(); //모든 유저를 담는 data
+    public List<User> data = new ArrayList<>();
 
 
     @Override
@@ -20,10 +20,10 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(UUID id, String name, String email, String phoneNumber) {
-        User user = findId(id); //명단에 있는지부터 먼저 확인
+        User user = findId(id);
         if (user == null) {
             System.out.println("존재하지 않는 사용자입니다.");
-            return null; //"없다"를 알려주기위해 null값을 돌려줌
+            return null;
         }
         user.update(name, email, phoneNumber);
         return user;

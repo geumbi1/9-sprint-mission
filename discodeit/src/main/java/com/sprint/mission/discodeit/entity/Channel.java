@@ -1,15 +1,16 @@
 package main.java.com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
     private final UUID id;
     private String channelName;
     private String description;
     private final Long createdAt;
     private Long updatedAt;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //자바가 원래 가지고 있는 클래스
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     Long now = System.currentTimeMillis();
 
     public Channel (String channelName, String description) {
