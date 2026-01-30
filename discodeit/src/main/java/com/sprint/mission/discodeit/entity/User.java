@@ -1,76 +1,50 @@
-package main.java.com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
+
+import lombok.Getter;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String displayName;
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String username;
     private String email;
-    private String phoneNumber;
+    private String password;
 
-    public User(String displayName, String email, String phoneNumber) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
-        long now = System.currentTimeMillis();
-        this.createdAt = now;
-        this.updatedAt = now;
-        this.displayName = displayName;
+        this.createdAt = Instant.now();
+        //
+        this.username = username;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void update(String name, String email, String phoneNumber) {
-        if (name != null) {
-            this.displayName = name;
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
         }
-        if (email != null) {
-            this.email = email;
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-        if (phoneNumber != null) {
-            this.phoneNumber = phoneNumber;
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
         }
-        this.updatedAt = System.currentTimeMillis();
-    }
 
-    @Override
-    public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        return "User{" +
-                "id=" + id +
-                ", createdAt=" + sdf.format(new Date(createdAt)) +
-                ", updatedAt=" + sdf.format(new Date(updatedAt)) +
-                ", displayName='" + displayName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

@@ -1,17 +1,18 @@
-package main.java.com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.file;
 
-import main.java.com.sprint.mission.discodeit.entity.User;
-import main.java.com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -46,9 +47,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findId(UUID userId) {
+    public Optional<User> findById(UUID id) {
         User userNullable = null;
-        Path path = resolvePath(userId);
+        Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -59,7 +60,6 @@ public class FileUserRepository implements UserRepository {
                 throw new RuntimeException(e);
             }
         }
-
         return Optional.ofNullable(userNullable);
     }
 
@@ -85,11 +85,14 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteById(UUID userId) {
-        Path path = resolvePath(userId);
-        if (Files.notExists(path)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
             Files.delete(path);
         } catch (IOException e) {
