@@ -1,4 +1,4 @@
-package main.java.com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit;
 
 import main.java.com.sprint.mission.discodeit.entity.Channel;
 import main.java.com.sprint.mission.discodeit.entity.ChannelType;
