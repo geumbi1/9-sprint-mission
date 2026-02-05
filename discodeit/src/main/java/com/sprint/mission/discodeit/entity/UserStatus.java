@@ -17,12 +17,12 @@ public class UserStatus {
     private Instant updatedAt;
     private Instant lastSeenAt;
 
-    UserStatus(UUID userId) {
+    public UserStatus(UUID userId, Instant lastSeenAt) {
         this.userId = userId;
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        this.lastSeenAt = Instant.now();
+        this.lastSeenAt = lastSeenAt;
     }
 
     //불리안을 통해 온라인인지 아닌지
