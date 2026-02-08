@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    //누가 어떤 채널을 읽었는지 찾음
     ReadStatus save(ReadStatus readStatus);
     List<ReadStatus> findAll();
     Optional<ReadStatus> findById(UUID id);

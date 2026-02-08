@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit;
 
-
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -35,20 +34,15 @@ public class DiscodeitApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-        //스프링 자동화 조종 기능을 context에 담음
         UserService userService = context.getBean(UserService.class);
-        //아까는 new를 통해 가져왔는데 이제는 bean을 통해 UserService를 가져옴
         MessageService messageService = context.getBean(MessageService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
 
-        // 셋업
         User user = setupUser(userService);
 
         System.out.println("첫번째  유저" + user.toString());
         Channel channel = setupChannel(channelService);
-        // 테스트
+
         messageCreateTest(messageService, channel, user);
     }
-
 }
-
