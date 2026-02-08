@@ -40,7 +40,7 @@ public class DiscodeitApplication {
 
         User user = setupUser(userService);
 
-        System.out.println("첫번째  유저" + user.toString());
+        System.out.println("첫번째 유저" + user.toString());
         Channel channel = setupChannel(channelService);
 
         messageCreateTest(messageService, channel, user);
