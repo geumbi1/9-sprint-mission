@@ -21,12 +21,11 @@ import lombok.NoArgsConstructor;
 public class UserStatus extends BaseUpdatableEntity {
 
   @JsonBackReference
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastActiveAt;
-
 
   public UserStatus(User user, Instant lastActiveAt) {
     setUser(user);
@@ -40,11 +39,11 @@ public class UserStatus extends BaseUpdatableEntity {
   }
 
   public Boolean isOnline() {
-    Instant fiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-    return lastActiveAt.isAfter(fiveMinutesAgo);
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
   }
 
-  public void setUser(User user) {
+  protected void setUser(User user) {
     this.user = user;
     user.setStatus(this);
   }
