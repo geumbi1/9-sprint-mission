@@ -27,6 +27,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.View;
 
+//..
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
@@ -38,7 +39,7 @@ class UserControllerTest {
 
   @MockBean
   private UserStatusService userStatusService;
-  
+
   @MockBean
   private View error;
 
