@@ -44,13 +44,11 @@ public class MessageController implements MessageApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-      @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-
-    log.info("API 호출 - 메시지 생성 요청 channelId: {}, authorId: {}",
-        messageCreateRequest.channelId(),
-        messageCreateRequest.authorId());
+    log.info("메시지 생성 요청: request={}, attachmentCount={}",
+        messageCreateRequest, attachments != null ? attachments.size() : 0);
 
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
@@ -67,11 +65,8 @@ public class MessageController implements MessageApi {
             })
             .toList())
         .orElse(new ArrayList<>());
-
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
-
-    log.info("API 완료 - 메시지 생성 성공 messageId: {}", createdMessage.id());
-
+    log.debug("메시지 생성 응답: {}", createdMessage);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
@@ -80,15 +75,10 @@ public class MessageController implements MessageApi {
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(
       @PathVariable("messageId") UUID messageId,
-      @Valid @RequestBody MessageUpdateRequest request
-  ) {
-
-    log.info("API 호출 - 메시지 수정 요청 messageId: {}", messageId);
-
+      @RequestBody @Valid MessageUpdateRequest request) {
+    log.info("메시지 수정 요청: id={}, request={}", messageId, request);
     MessageDto updatedMessage = messageService.update(messageId, request);
-
-    log.info("API 완료 - 메시지 수정 성공 messageId: {}", messageId);
-
+    log.debug("메시지 수정 응답: {}", updatedMessage);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedMessage);
@@ -96,13 +86,9 @@ public class MessageController implements MessageApi {
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
-
-    log.info("API 호출 - 메시지 삭제 요청 messageId: {}", messageId);
-
+    log.info("메시지 삭제 요청: id={}", messageId);
     messageService.delete(messageId);
-
-    log.info("API 완료 - 메시지 삭제 성공 messageId: {}", messageId);
-
+    log.debug("메시지 삭제 완료");
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -117,16 +103,12 @@ public class MessageController implements MessageApi {
           page = 0,
           sort = "createdAt",
           direction = Direction.DESC
-      ) Pageable pageable
-  ) {
-
-    log.debug("API 호출 - 메시지 목록 조회 channelId: {}", channelId);
-
+      ) Pageable pageable) {
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}",
+        channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
-
-    log.debug("API 완료 - 메시지 목록 조회");
-
+    log.debug("채널별 메시지 목록 조회 응답: totalElements={}", messages.totalElements());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);

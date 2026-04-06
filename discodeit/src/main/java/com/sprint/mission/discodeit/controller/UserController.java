@@ -42,17 +42,14 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("API 호출 - 사용자 생성 요청");
-
+    log.info("사용자 생성 요청: {}", userCreateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
-
-    log.info("API 완료 - 사용자 생성 성공 userId: {}", createdUser.id());
-
+    log.debug("사용자 생성 응답: {}", createdUser);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -65,17 +62,14 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("API 호출 - 사용자 수정 요청 userId: {}", userId);
-
+    log.info("사용자 수정 요청: id={}, request={}", userId, userUpdateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-
-    log.info("API 완료 - 사용자 수정 성공 userId: {}", userId);
-
+    log.debug("사용자 수정 응답: {}", updatedUser);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -84,13 +78,7 @@ public class UserController implements UserApi {
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
-
-    log.info("API 호출 - 사용자 삭제 요청 userId: {}", userId);
-
     userService.delete(userId);
-
-    log.info("API 완료 - 사용자 삭제 성공 userId: {}", userId);
-
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -99,13 +87,7 @@ public class UserController implements UserApi {
   @GetMapping
   @Override
   public ResponseEntity<List<UserDto>> findAll() {
-
-    log.debug("API 호출 - 사용자 전체 조회");
-
     List<UserDto> users = userService.findAll();
-
-    log.debug("API 완료 - 사용자 전체 조회 count: {}", users.size());
-
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(users);
@@ -113,15 +95,10 @@ public class UserController implements UserApi {
 
   @PatchMapping(path = "{userId}/userStatus")
   @Override
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
-
-    log.info("API 호출 - 사용자 상태 수정 userId: {}", userId);
-
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
+      @PathVariable("userId") UUID userId,
+      @RequestBody @Valid UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
-
-    log.info("API 완료 - 사용자 상태 수정 성공 userId: {}", userId);
-
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUserStatus);

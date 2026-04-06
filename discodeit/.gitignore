@@ -12,3 +12,5 @@ build/
 # Logs
 *.log
 file-data-map/
+
+.env

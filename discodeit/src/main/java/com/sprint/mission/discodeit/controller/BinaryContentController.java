@@ -28,13 +28,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-
-    log.debug("API 호출 - 파일 메타데이터 조회 id: {}", binaryContentId);
-
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
     BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
-
-    log.debug("API 완료 - 파일 메타데이터 조회 id: {}", binaryContentId);
-
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContent);
@@ -43,13 +39,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-
-    log.debug("API 호출 - 파일 목록 조회 count: {}", binaryContentIds.size());
-
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
     List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-
-    log.debug("API 완료 - 파일 목록 조회 count: {}", binaryContents.size());
-
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContents);
@@ -58,15 +50,11 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-
-    log.info("API 호출 - 파일 다운로드 요청 id: {}", binaryContentId);
-
+    log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-
     ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
-
-    log.info("API 완료 - 파일 다운로드 성공 id: {}", binaryContentId);
-
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
     return response;
   }
 }
