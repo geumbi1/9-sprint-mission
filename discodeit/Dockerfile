@@ -9,7 +9,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
 
 ENV PROJECT_NAME=discodeit
-ENV PROJECT_VERSION=0.0.1-SNAPSHOT
+ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
 
 EXPOSE 80
