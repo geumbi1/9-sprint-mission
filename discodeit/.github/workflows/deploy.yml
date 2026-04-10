@@ -1,11 +1,9 @@
 name: CD
 
 on:
+  workflow_call: # 💡 외부에서 호출될 수 있게 허용하는 옵션입니다.
   push:
-    branches:
-      - release
-    paths:
-      - 'discodeit/**'
+    branches: [ release ]
 
 jobs:
   build-and-push:

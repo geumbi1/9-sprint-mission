@@ -1,0 +1,20 @@
+name: Root Trigger
+
+on:
+  push:
+    branches: [ release, main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # CI 실행 (PR 시 또는 main 푸시 시)
+  ci-process:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  # CD 실행 (release 브랜치 푸시 시)
+  cd-process:
+    if: github.ref == 'refs/heads/release'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
