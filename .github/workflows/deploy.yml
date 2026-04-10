@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
+          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest ./discodeit
           docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
       - name: Push Docker image
