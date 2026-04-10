@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches:
-      - release
+      - release # 💡 release 브랜치에 Push 될 때만 작동합니다!
 
 jobs:
   build-and-push:
@@ -62,7 +62,20 @@ jobs:
           aws ecs register-task-definition \
             --cli-input-json file://task-def.json
 
-      - name: Update ECS service
+      - name: Stop existing ECS service (프리티어 메모리 확보)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --desired-count 0
+
+      - name: Wait for service to stop (안전 종료 대기)
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }}
+
+      - name: Update ECS service with new task (새 버전 배포)
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
