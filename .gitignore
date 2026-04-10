@@ -1,4 +1,4 @@
-# mac
+# Mac
 .DS_Store
 
 # IntelliJ
@@ -6,12 +6,18 @@
 *.iml
 out/
 
-# build
+# Build & Gradle
 build/
 .gradle/
 
-# logs
+# Logs
 *.log
+file-data-map/
 
-# local storage
+# Local Storage & Resources
 storage/
+src/main/resources/fe_bundle_1.2.3.zip
+
+# Environment Variables
+.env
+discodeit.env
