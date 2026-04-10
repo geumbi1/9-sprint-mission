@@ -3,17 +3,21 @@ name: CI
 on:
   pull_request:
     branches: [ main ]
+  push:
+    branches: [ main ]
+    paths:
+      - 'discodeit/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    # 💡 모든 단계를 discodeit 폴더 안에서 실행하도록 설정
     defaults:
       run:
         working-directory: ./discodeit
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -30,5 +34,6 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          # 💡 파일 경로도 discodeit 폴더 기준으로 지정
+          # working-directory 설정이 있어도 files 경로는 프로젝트 루트 기준이 안전합니다.
           files: discodeit/build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: true

@@ -3,11 +3,16 @@ name: CD
 on:
   push:
     branches:
-      - release # 💡 release 브랜치에 Push 될 때만 작동합니다!
+      - release
+    paths:
+      - 'discodeit/**'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./discodeit
 
     steps:
       - name: Checkout
@@ -27,7 +32,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest ./discodeit
+          # defaults 설정 덕분에 이미 discodeit 폴더 안이므로 '.'을 사용합니다.
+          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
           docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
       - name: Push Docker image
@@ -38,6 +44,10 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    # 배포 단계는 AWS CLI 명령이 주이므로 working-directory가 크게 중요치 않으나 통일성을 위해 유지합니다.
+    defaults:
+      run:
+        working-directory: ./discodeit
 
     steps:
       - name: Configure AWS
@@ -69,13 +79,13 @@ jobs:
             --service ${{ vars.ECS_SERVICE }} \
             --desired-count 0
 
-      - name: Wait for service to stop (안전 종료 대기)
+      - name: Wait for service to stop
         run: |
           aws ecs wait services-stable \
             --cluster ${{ vars.ECS_CLUSTER }} \
             --service ${{ vars.ECS_SERVICE }}
 
-      - name: Update ECS service with new task (새 버전 배포)
+      - name: Update ECS service with new task
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \

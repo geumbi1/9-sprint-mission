@@ -1,29 +1,29 @@
-# ===== 1단계: build =====
+# ===== 1단계: build stage =====
 FROM gradle:8-jdk17 AS build
 WORKDIR /app
 
-# 1. 의존성 파일 복사
+# 1. 의존성 파일 복사 (현재 위치가 이미 discodeit 폴더 안이므로 그대로 복사)
 COPY build.gradle settings.gradle gradlew ./
 COPY gradle ./gradle
 
-# 2. 의존성 다운로드
+# 2. 의존성 다운로드 (캐시 활용)
 RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
 
 # 3. 소스 코드 복사
 COPY src ./src
 
-# 4. 빌드 (plain jar 생성을 방지하고 최적화)
+# 4. 빌드 (테스트 제외 및 빌드 실행)
+# plain jar 생성을 방지하기 위해 build.gradle에 jar { enabled = false } 설정을 권장합니다.
 RUN ./gradlew clean build -x test --no-daemon
 
-# ===== 2단계: runtime (local-slim 환경) =====
+# ===== 2단계: runtime stage (이미지 최적화 - local-slim) =====
 FROM amazoncorretto:17-alpine-jdk
-# 💡 alpine 버전을 쓰면 이미지 크기가 훨씬 줄어듭니다 (심화 요구사항 대응)
-
 WORKDIR /app
 
-# plain.jar를 제외하고 실제 실행 가능한 jar만 복사
-COPY --from=build /app/build/libs/*-SNAPSHOT.jar app.jar || COPY --from=build /app/build/libs/*[0-9].jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 
+# 컨테이너 포트 설정
 EXPOSE 8080
 
-CMD ["java", "-jar", "app.jar"]
+# 실행 명령어
+ENTRYPOINT ["java", "-jar", "app.jar"]
