@@ -9,6 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # 모든 Gradle 명령어를 discodeit 폴더 내부에서 실행합니다.
+    defaults:
+      run:
+        working-directory: ./discodeit
 
     steps:
       - uses: actions/checkout@v3
@@ -22,13 +26,14 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Run tests
+      - name: Run tests with Jacoco
+        # 테스트를 실행하고 커버리지 보고서(Jacoco)를 생성합니다.
         run: ./gradlew test jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          # 경로에서 discodeit/ 을 제거했습니다.
-          files: build/reports/jacoco/test/jacocoTestReport.xml
+          # 보고서 파일의 위치를 지정합니다 (루트 기준 경로)
+          files: discodeit/build/reports/jacoco/test/jacocoTestReport.xml
           fail_ci_if_error: true
