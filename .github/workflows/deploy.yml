@@ -26,8 +26,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          # '.' 대신 './discodeit'으로 경로를 지정합니다.
-          # 이렇게 하면 도커가 discodeit 폴더 안의 Dockerfile을 찾아 빌드합니다.
+          # 루트에서 discodeit 폴더를 찾아가서 빌드합니다.
           docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest ./discodeit
           docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
@@ -54,14 +53,19 @@ jobs:
             --task-definition ${{ vars.ECS_TASK_DEFINITION }} \
             --query taskDefinition > task-def.json
 
-      - name: Update task definition (image)
+      - name: Clean JSON & Update Image
         run: |
-          sed -i 's|public.ecr.aws/q1l1t8u5/discodeit:.*|${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}|g' task-def.json
+          # 1. AWS가 내려준 JSON에서 등록 에러를 유발하는 불필요한 메타데이터를 삭제합니다.
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' task-def.json > clean-task-def.json
+          
+          # 2. 방금 ECR에 푸시한 새로운 이미지(GitHub 커밋 해시 태그)로 갈아끼웁니다.
+          jq --arg IMAGE "${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}" '.containerDefinitions[0].image = $IMAGE' clean-task-def.json > final-task-def.json
 
       - name: Register new task definition
         run: |
+          # 깨끗하게 정제된 JSON 파일을 사용해 새 버전을 등록합니다.
           aws ecs register-task-definition \
-            --cli-input-json file://task-def.json
+            --cli-input-json file://final-task-def.json
 
       - name: Stop existing ECS service (프리티어 메모리 확보)
         run: |
