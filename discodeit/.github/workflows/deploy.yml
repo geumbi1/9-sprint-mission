@@ -1,16 +1,12 @@
 name: CD
 
 on:
-  workflow_call: # 💡 외부에서 호출될 수 있게 허용하는 옵션입니다.
   push:
     branches: [ release ]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./discodeit
 
     steps:
       - name: Checkout
@@ -30,7 +26,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          # defaults 설정 덕분에 이미 discodeit 폴더 안이므로 '.'을 사용합니다.
+          # 이미 위치가 discodeit 프로젝트 내부이므로 '.' 을 사용합니다.
           docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
           docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
@@ -42,10 +38,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # 배포 단계는 AWS CLI 명령이 주이므로 working-directory가 크게 중요치 않으나 통일성을 위해 유지합니다.
-    defaults:
-      run:
-        working-directory: ./discodeit
 
     steps:
       - name: Configure AWS
@@ -83,7 +75,7 @@ jobs:
             --cluster ${{ vars.ECS_CLUSTER }} \
             --service ${{ vars.ECS_SERVICE }}
 
-      - name: Update ECS service with new task
+      - name: Update ECS service with new task (새 버전 배포)
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
