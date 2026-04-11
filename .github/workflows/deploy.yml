@@ -26,8 +26,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          # 이미 위치가 discodeit 프로젝트 내부이므로 '.' 을 사용합니다.
-          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
+          # '.' 대신 './discodeit'으로 경로를 지정합니다.
+          # 이렇게 하면 도커가 discodeit 폴더 안의 Dockerfile을 찾아 빌드합니다.
+          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest ./discodeit
           docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
       - name: Push Docker image
