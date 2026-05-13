@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -61,10 +62,10 @@ class BasicUserStatusServiceTest {
 
     user = new User("testUser", "test@example.com", "password", null);
     ReflectionTestUtils.setField(user, "id", userId);
-
+    
     userStatus = new UserStatus(user, lastActiveAt);
     ReflectionTestUtils.setField(userStatus, "id", userStatusId);
-
+    
     userStatusDto = new UserStatusDto(userStatusId, userId, lastActiveAt);
   }
 
@@ -75,7 +76,7 @@ class BasicUserStatusServiceTest {
     UserStatusCreateRequest request = new UserStatusCreateRequest(userId, lastActiveAt);
     given(userRepository.findById(eq(userId))).willReturn(Optional.of(user));
     given(userStatusMapper.toDto(any(UserStatus.class))).willReturn(userStatusDto);
-
+    
     // 사용자에게 기존 상태가 없어야 함
     ReflectionTestUtils.setField(user, "status", null);
 
@@ -93,7 +94,7 @@ class BasicUserStatusServiceTest {
     // given
     UserStatusCreateRequest request = new UserStatusCreateRequest(userId, lastActiveAt);
     given(userRepository.findById(eq(userId))).willReturn(Optional.of(user));
-
+    
     // 사용자에게 이미 상태가 있음
     ReflectionTestUtils.setField(user, "status", userStatus);
 
@@ -160,7 +161,7 @@ class BasicUserStatusServiceTest {
     // given
     Instant newLastActiveAt = Instant.now().plusSeconds(60);
     UserStatusUpdateRequest request = new UserStatusUpdateRequest(newLastActiveAt);
-
+    
     given(userStatusRepository.findById(eq(userStatusId))).willReturn(Optional.of(userStatus));
     given(userStatusMapper.toDto(any(UserStatus.class))).willReturn(userStatusDto);
 
@@ -177,7 +178,7 @@ class BasicUserStatusServiceTest {
     // given
     Instant newLastActiveAt = Instant.now().plusSeconds(60);
     UserStatusUpdateRequest request = new UserStatusUpdateRequest(newLastActiveAt);
-
+    
     given(userStatusRepository.findById(eq(userStatusId))).willReturn(Optional.empty());
 
     // when & then
@@ -191,7 +192,7 @@ class BasicUserStatusServiceTest {
     // given
     Instant newLastActiveAt = Instant.now().plusSeconds(60);
     UserStatusUpdateRequest request = new UserStatusUpdateRequest(newLastActiveAt);
-
+    
     given(userStatusRepository.findByUserId(eq(userId))).willReturn(Optional.of(userStatus));
     given(userStatusMapper.toDto(any(UserStatus.class))).willReturn(userStatusDto);
 
@@ -208,7 +209,7 @@ class BasicUserStatusServiceTest {
     // given
     Instant newLastActiveAt = Instant.now().plusSeconds(60);
     UserStatusUpdateRequest request = new UserStatusUpdateRequest(newLastActiveAt);
-
+    
     given(userStatusRepository.findByUserId(eq(userId))).willReturn(Optional.empty());
 
     // when & then

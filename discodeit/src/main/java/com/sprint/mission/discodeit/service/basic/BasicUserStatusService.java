@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,6 +52,7 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatusMapper.toDto(userStatus);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public UserStatusDto find(UUID userStatusId) {
     log.debug("사용자 상태 조회 시작: id={}", userStatusId);
@@ -62,6 +63,7 @@ public class BasicUserStatusService implements UserStatusService {
     return dto;
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserStatusDto> findAll() {
     log.debug("전체 사용자 상태 목록 조회 시작");
